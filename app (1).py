@@ -10,7 +10,9 @@ import streamlit as st
 from bs4 import BeautifulSoup
 from rapidfuzz import fuzz
 from openpyxl import load_workbook
-from openpyxl.styles import PatternFill, Font, Alignment
+from openpyxl.styles import PatternFill, Font, Alignmentst.write("Page length:", len(r.text))
+st.write("First 1000 chars:")
+st.code(r.text[:1000])
 from xml.etree import ElementTree as ET
 
 st.set_page_config(
@@ -119,6 +121,20 @@ def scrape_website(url):
     r = requests.get(url, headers=headers, timeout=30)
     r.raise_for_status()
     soup = BeautifulSoup(r.text, "lxml")
+    st.write("Page length:", len(r.text))
+    st.write("First 1000 chars:")
+    st.code(r.text[:1000])
+    st.write("Tag counts:")
+    st.write({
+        "h1": len(soup.find_all("h1")),
+        "h2": len(soup.find_all("h2")),
+        "h3": len(soup.find_all("h3")),
+        "p": len(soup.find_all("p")),
+        "div": len(soup.find_all("div")),
+        "li": len(soup.find_all("li")),
+    })
+    for p in soup.find_all("p")[:5]:
+    st.write(p.get_text(" ", strip=True))
     records, current_year = [], ""
     for tag in soup.find_all(["h2", "p"]):
         if tag.name == "h2":
