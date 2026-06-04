@@ -459,6 +459,10 @@ if run:
                 st.write(f"Scraping `{WEBSITE_URL}` …")
                 website = scrape_website(WEBSITE_URL)
             st.write(f"✅ {len(website)} website entries loaded")
+            # DEBUG
+            st.write("PubMed records:", len(pubmed))
+            st.write("Website records:", len(website))
+            st.write("Website sample:", website[:10])
         except Exception as e:
             errors.append(f"Website error: {e}")
             website = []
