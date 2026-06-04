@@ -111,37 +111,48 @@ def scrape_website(url):
     r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
     soup = BeautifulSoup(r.text, "lxml")
 
+    # get full text of page instead of per-tag parsing
+    full_text = soup.get_text("\n")
+
     records = []
     current_year = None
 
-    for tag in soup.find_all(["h2", "div", "p", "li"]):
-        text = tag.get_text(" ", strip=True)
-        if not text:
+    # split by lines
+    lines = [l.strip() for l in full_text.split("\n") if l.strip()]
+
+    buffer = []
+
+    for line in lines:
+
+        # detect year
+        if re.match(r"^20\d{2}$", line):
+            current_year = line
             continue
 
-        if tag.name == "h2" and re.match(r"^\d{4}$", text.strip()):
-            current_year = text.strip()
-            continue
-
+        # skip until we hit first year
         if not current_year:
             continue
 
-        if len(text) < 60:
-            continue
+        buffer.append(line)
 
-        doi = _extract_doi_from_text(text)
-        title = _extract_title(text)
+        # heuristic: publication usually ends with period
+        if line.endswith(".") and len(" ".join(buffer)) > 80:
 
-        if title:
-            records.append({
-                "Title": title,
-                "Year": current_year,
-                "DOI": normalize_doi(doi),
-                "Raw": text
-            })
+            text = " ".join(buffer)
+            buffer = []
+
+            title = _extract_title(text)
+            doi = _extract_doi_from_text(text)
+
+            if title and len(text) > 80:
+                records.append({
+                    "Title": title,
+                    "Year": current_year,
+                    "DOI": normalize_doi(doi),
+                    "Raw": text
+                })
 
     return records
-
 
 def _extract_doi_from_text(text):
     m = re.search(r"https?://(?:dx\.)?doi\.org/\S+", text)
