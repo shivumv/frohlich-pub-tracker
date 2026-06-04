@@ -132,7 +132,7 @@ def scrape_website(url):
         "li": len(soup.find_all("li")),
     })
     for p in soup.find_all("p")[:5]:
-    st.write(p.get_text(" ", strip=True))
+        st.write(p.get_text(" ", strip=True))
     records, current_year = [], ""
     for tag in soup.find_all(["h2", "p"]):
         if tag.name == "h2":
