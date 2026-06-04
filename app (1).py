@@ -10,9 +10,7 @@ import streamlit as st
 from bs4 import BeautifulSoup
 from rapidfuzz import fuzz
 from openpyxl import load_workbook
-from openpyxl.styles import PatternFill, Font, Alignmentst.write("Page length:", len(r.text))
-st.write("First 1000 chars:")
-st.code(r.text[:1000])
+from openpyxl.styles import PatternFill, Font, Alignment
 from xml.etree import ElementTree as ET
 
 st.set_page_config(
